@@ -1,2 +1,1 @@
-# binary_trees
-Binary Tree
+# Binary Tree
