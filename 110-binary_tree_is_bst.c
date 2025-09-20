@@ -11,15 +11,15 @@
  */
 static int is_bst_helper(const binary_tree_t *tree, long min, long max)
 {
-    if (!tree)
-        return 1; /* empty tree is BST */
+	if (!tree)
+		return (1); /* empty tree is BST */
 
-    if (tree->n <= min || tree->n >= max)
-        return 0; /* violates BST property */
+	if (tree->n <= min || tree->n >= max)
+		return (0); /* violates BST property */
 
-    /* check subtrees with updated limits */
-    return is_bst_helper(tree->left, min, tree->n) &&
-           is_bst_helper(tree->right, tree->n, max);
+	/* check subtrees with updated limits */
+	return (is_bst_helper(tree->left, min, tree->n) &&
+		is_bst_helper(tree->right, tree->n, max));
 }
 
 /**
@@ -30,8 +30,8 @@ static int is_bst_helper(const binary_tree_t *tree, long min, long max)
  */
 int binary_tree_is_bst(const binary_tree_t *tree)
 {
-    if (!tree)
-        return 0;
+	if (!tree)
+		return (0);
 
-    return is_bst_helper(tree, LONG_MIN, LONG_MAX);
+	return (is_bst_helper(tree, LONG_MIN, LONG_MAX));
 }
