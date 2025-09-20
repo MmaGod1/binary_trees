@@ -1,63 +1,66 @@
 #include "binary_trees.h"
 
 /**
- * binary_tree_size - measures the size of a binary tree
- * @tree: tree to measure
+ * binary_tree_size - Measures the size of a binary tree
+ * @tree: Pointer to root
  *
- * Return: size of the tree, 0 if NULL
+ * Return: Number of nodes, 0 if NULL
  */
 size_t binary_tree_size(const binary_tree_t *tree)
 {
     if (!tree)
-        return (0);
+        return 0;
     return 1 + binary_tree_size(tree->left) + binary_tree_size(tree->right);
 }
 
 /**
- * heap_insert - inserts a value in a Max Binary Heap
- * @root: double pointer to the root node
- * @value: value to insert
+ * heap_insert - Inserts a value into a Max Binary Heap
+ * @root: Double pointer to the root node
+ * @value: Value to insert
  *
- * Return: pointer to the created node, NULL on failure
+ * Return: Pointer to the created node, or NULL on failure
  */
 heap_t *heap_insert(heap_t **root, int value)
 {
-    heap_t *tree, *new_node, *curr;
-    int size, leaves, level, sub, bit, tmp;
+    heap_t *new_node, **queue, *current;
+    size_t front = 0, rear = 0, size = 0;
+    int tmp;
 
     if (!root)
-        return (NULL);
+        return NULL;
     if (!*root)
         return (*root = binary_tree_node(NULL, value));
 
-    tree = *root;
-    size = binary_tree_size(tree);
+    size = binary_tree_size(*root);
+    queue = malloc(sizeof(heap_t *) * size);
+    if (!queue)
+        return NULL;
 
-    /* Compute number of leaves at the bottom level */
-    leaves = size;
-    for (level = 0, sub = 1; leaves >= sub; sub *= 2, level++)
-        leaves -= sub;
-
-    /* Traverse tree using binary representation of leaves */
-    for (bit = 1 << (level - 1); bit > 0; bit >>= 1)
-        tree = (leaves & bit) ? tree->right : tree->left;
-
-    /* Insert new node at first empty slot */
-    new_node = binary_tree_node(tree, value);
-    if (leaves & 1)
-        tree->right = new_node;
-    else
-        tree->left = new_node;
-
-    /* Bubble up values to maintain Max Heap */
-    curr = new_node;
-    while (curr->parent && curr->n > curr->parent->n)
+    queue[rear++] = *root;
+    while (front < rear)
     {
-        tmp = curr->n;
-        curr->n = curr->parent->n;
-        curr->parent->n = tmp;
-        curr = curr->parent;
+        current = queue[front++];
+        if (!current->left || !current->right)
+        {
+            new_node = binary_tree_node(current, value);
+            if (!current->left)
+                current->left = new_node;
+            else
+                current->right = new_node;
+            break;
+        }
+        queue[rear++] = current->left;
+        queue[rear++] = current->right;
+    }
+    free(queue);
+
+    while (new_node->parent && new_node->n > new_node->parent->n)
+    {
+        tmp = new_node->n;
+        new_node->n = new_node->parent->n;
+        new_node->parent->n = tmp;
+        new_node = new_node->parent;
     }
 
-    return (new_node);
+    return new_node;
 }
