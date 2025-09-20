@@ -10,35 +10,57 @@
 avl_t *avl_insert(avl_t **tree, int value)
 {
     avl_t *node;
+    int balance;
 
     if (!tree)
         return (NULL);
 
-    /* Insert as in a BST */
     if (!*tree)
-        return (*tree = binary_tree_node(NULL, value));
+    {
+        *tree = binary_tree_node(NULL, value);
+        return (*tree);
+    }
 
     if (value < (*tree)->n)
-        node = (*tree)->left ? avl_insert(&(*tree)->left, value)
-                              : (*tree)->left = binary_tree_node(*tree, value);
+    {
+        if ((*tree)->left)
+            node = avl_insert(&(*tree)->left, value);
+        else
+            node = (*tree)->left = binary_tree_node(*tree, value);
+    }
     else if (value > (*tree)->n)
-        node = (*tree)->right ? avl_insert(&(*tree)->right, value)
-                               : (*tree)->right = binary_tree_node(*tree, value);
+    {
+        if ((*tree)->right)
+            node = avl_insert(&(*tree)->right, value);
+        else
+            node = (*tree)->right = binary_tree_node(*tree, value);
+    }
     else
-        return (NULL); /* Ignore duplicates */
+        return (NULL);
 
-    /* Rebalance if needed */
-    int balance = binary_tree_balance(*tree);
+    /* Rebalance */
+    balance = binary_tree_balance(*tree);
 
     if (balance > 1)
-        *tree = (value < (*tree)->left->n) ? 
-                 binary_tree_rotate_right(*tree) : 
-                 (binary_tree_rotate_left((*tree)->left), binary_tree_rotate_right(*tree));
-
+    {
+        if (value < (*tree)->left->n)
+            *tree = binary_tree_rotate_right(*tree);
+        else
+        {
+            (*tree)->left = binary_tree_rotate_left((*tree)->left);
+            *tree = binary_tree_rotate_right(*tree);
+        }
+    }
     if (balance < -1)
-        *tree = (value > (*tree)->right->n) ? 
-                 binary_tree_rotate_left(*tree) : 
-                 (binary_tree_rotate_right((*tree)->right), binary_tree_rotate_left(*tree));
+    {
+        if (value > (*tree)->right->n)
+            *tree = binary_tree_rotate_left(*tree);
+        else
+        {
+            (*tree)->right = binary_tree_rotate_right((*tree)->right);
+            *tree = binary_tree_rotate_left(*tree);
+        }
+    }
 
     return (node);
 }
