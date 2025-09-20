@@ -1,4 +1,5 @@
 #include "binary_trees.h"
+#include "9-binary_tree_height.c"
 
 /**
  * min_value_node - Finds the node with the minimum value in a BST
