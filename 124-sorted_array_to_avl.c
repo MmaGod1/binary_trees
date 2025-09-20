@@ -1,48 +1,46 @@
 #include "binary_trees.h"
 
-
-avl_t *sorted_array_to_avl_recursive(int *array, size_t start, size_t end,
-		avl_t *parent);
 /**
- * sorted_array_to_avl - Builds an AVL tree from a sorted array
+ * sorted_array_to_avl_helper - Recursively builds a balanced AVL tree
+ *                               from a sorted array
  * @array: Pointer to the first element of the array
- * @size: Number of elements in the array
+ * @start: Start index of the current subarray
+ * @end: End index of the current subarray
+ * @parent: Pointer to the parent node
  *
- * Return: Pointer to the root node of the created AVL tree, or NULL on failure
+ * Return: Pointer to the root node of the subtree
  */
-avl_t *sorted_array_to_avl(int *array, size_t size)
+avl_t *sorted_array_to_avl_helper(int *array, int start, int end, avl_t *parent)
 {
-	if (array == NULL || size == 0)
-		return (NULL);
+    int mid;
+    avl_t *node;
 
-	return (sorted_array_to_avl_recursive(array, 0, size - 1, NULL));
+    if (start > end)
+        return (NULL);
+
+    mid = (start + end) / 2;
+    node = binary_tree_node(parent, array[mid]);
+    if (!node)
+        return (NULL);
+
+    node->left = sorted_array_to_avl_helper(array, start, mid - 1, node);
+    node->right = sorted_array_to_avl_helper(array, mid + 1, end, node);
+
+    return (node);
 }
 
 /**
- * sorted_array_to_avl_recursive - Recursively builds AVL tree
- * @array: Pointer to array
- * @start: Start index of the current subarray
- * @end: End index of the current subarray
- * @parent: Pointer to parent node
+ * sorted_array_to_avl - Builds a balanced AVL tree from a sorted array
+ * @array: Pointer to the first element of the array
+ * @size: Number of elements in the array
  *
- * Return: Pointer to root of subtree
+ * Return: Pointer to the root node of the created AVL tree,
+ *         or NULL on failure
  */
-avl_t *sorted_array_to_avl_recursive(int *array, size_t start, size_t end,
-		avl_t *parent)
+avl_t *sorted_array_to_avl(int *array, size_t size)
 {
-	avl_t *root;
-	size_t mid;
+    if (!array || size == 0)
+        return (NULL);
 
-	if (start > end)
-		return (NULL);
-
-	mid = (start + end) / 2;
-	root = binary_tree_node(parent, array[mid]);
-	if (root == NULL)
-		return (NULL);
-
-	root->left = sorted_array_to_avl_recursive(array, start, mid - 1, root);
-	root->right = sorted_array_to_avl_recursive(array, mid + 1, end, root);
-
-	return (root);
+    return (sorted_array_to_avl_helper(array, 0, (int)size - 1, NULL));
 }
