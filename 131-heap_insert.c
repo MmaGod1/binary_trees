@@ -1,109 +1,104 @@
 #include "binary_trees.h"
+#include <stdlib.h>
 
-/* Forward declarations */
-heap_t *find_insertion_parent(heap_t *root);
-void bubble_up(heap_t *node);
+/**
+ * heapify_up - Moves a node up to maintain Max Heap property
+ * @node: Pointer to the node to heapify
+ */
+void heapify_up(heap_t *node)
+{
+    int tmp;
+
+    while (node->parent && node->n > node->parent->n)
+    {
+        tmp = node->n;
+        node->n = node->parent->n;
+        node->parent->n = tmp;
+        node = node->parent;
+    }
+}
+
+/**
+ * heap_size - Returns the total number of nodes in a binary tree
+ * @tree: Pointer to the root node
+ * Return: Size of the tree
+ */
+size_t heap_size(const heap_t *tree)
+{
+    if (!tree)
+        return (0);
+    return (1 + heap_size(tree->left) + heap_size(tree->right));
+}
+
+/**
+ * heap_insert_node - Inserts a node at the first available spot (level-order)
+ * @root: Pointer to the root node
+ * @node: Node to insert
+ * Return: Pointer to the inserted node
+ */
+heap_t *heap_insert_node(heap_t **root, heap_t *node)
+{
+    size_t size = heap_size(*root);
+    heap_t **queue = malloc(sizeof(heap_t *) * size);
+    size_t front = 0, rear = 0;
+    heap_t *current;
+
+    if (!queue)
+        return (NULL);
+
+    queue[rear++] = *root;
+
+    while (front < rear)
+    {
+        current = queue[front++];
+        if (!current->left)
+        {
+            current->left = node;
+            node->parent = current;
+            free(queue);
+            return (node);
+        }
+        if (!current->right)
+        {
+            current->right = node;
+            node->parent = current;
+            free(queue);
+            return (node);
+        }
+        queue[rear++] = current->left;
+        queue[rear++] = current->right;
+    }
+
+    free(queue);
+    return (NULL);
+}
 
 /**
  * heap_insert - Inserts a value in a Max Binary Heap
  * @root: Double pointer to the root node of the heap
- * @value: Value to insert
+ * @value: Value to store in the new node
  *
  * Return: Pointer to the created node, or NULL on failure
  */
 heap_t *heap_insert(heap_t **root, int value)
 {
-	heap_t *new_node, *parent;
+    heap_t *node;
 
-	if (root == NULL)
-		return (NULL);
+    if (!root)
+        return (NULL);
 
-	/* If heap is empty, new node becomes root */
-	if (*root == NULL)
-	{
-		*root = binary_tree_node(NULL, value);
-		return (*root);
-	}
+    node = binary_tree_node(NULL, value);
+    if (!node)
+        return (NULL);
 
-	/* Find the parent where we should insert the new node */
-	parent = find_insertion_parent(*root);
-	if (parent == NULL)
-		return (NULL);
+    if (!*root)
+    {
+        *root = node;
+        return (node);
+    }
 
-	/* Insert as left or right child */
-	new_node = binary_tree_node(parent, value);
-	if (new_node == NULL)
-		return (NULL);
+    heap_insert_node(root, node);
+    heapify_up(node);
 
-	if (parent->left == NULL)
-		parent->left = new_node;
-	else
-		parent->right = new_node;
-
-	/* Restore heap property */
-	bubble_up(new_node);
-
-	return (new_node);
-}
-
-/**
- * find_insertion_parent - Finds the parent where next node should be inserted
- * Uses level-order traversal (queue).
- * @root: Pointer to root of heap
- *
- * Return: Pointer to parent node, or NULL on failure
- */
-heap_t *find_insertion_parent(heap_t *root)
-{
-	const heap_t **queue;
-	size_t front = 0, rear = 0;
-	heap_t *current;
-
-	if (root == NULL)
-		return (NULL);
-
-	queue = malloc(sizeof(heap_t *) * 1024);
-	if (queue == NULL)
-		return (NULL);
-
-	queue[rear++] = root;
-
-	while (front < rear)
-	{
-		current = (heap_t *)queue[front++];
-
-		/* If this node has a free spot, return it */
-		if (current->left == NULL || current->right == NULL)
-		{
-			free(queue);
-			return (current);
-		}
-
-		/* Otherwise enqueue children */
-		queue[rear++] = current->left;
-		queue[rear++] = current->right;
-	}
-
-	free(queue);
-	return (NULL);
-}
-
-/**
- * bubble_up - Restores heap property by swapping node upwards
- * @node: Newly inserted node
- */
-void bubble_up(heap_t *node)
-{
-	int temp;
-
-	while (node->parent && node->n > node->parent->n)
-	{
-		/* Swap values */
-		temp = node->n;
-		node->n = node->parent->n;
-		node->parent->n = temp;
-
-		/* Move up */
-		node = node->parent;
-	}
+    return (node);
 }
