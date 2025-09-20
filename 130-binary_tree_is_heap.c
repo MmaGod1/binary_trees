@@ -1,4 +1,5 @@
 #include "binary_trees.h"
+#include "102-binary_tree_is_complete.c"
 
 /* Forward declarations */
 int binary_tree_is_complete(const binary_tree_t *tree);

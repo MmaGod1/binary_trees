@@ -1,5 +1,8 @@
 #include "binary_trees.h"
 
+
+avl_t *sorted_array_to_avl_recursive(int *array, size_t start, size_t end,
+		avl_t *parent);
 /**
  * sorted_array_to_avl - Builds an AVL tree from a sorted array
  * @array: Pointer to the first element of the array

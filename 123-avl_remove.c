@@ -1,5 +1,7 @@
 #include "binary_trees.h"
 
+avl_t *avl_rebalance(avl_t *root);
+
 /**
  * avl_remove - Removes a node from an AVL tree
  * @root: Pointer to the root node of the tree
